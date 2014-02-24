@@ -5,6 +5,10 @@ Ctypes Python wrapper for S. Manen, M. Guillaumin, L. Van Gool's Random Prim's A
 
 Visit: https://github.com/smanenfr/rp to get the original code.
 
+Set-Up
+======
+Copy the wrapper files into their respective folders of the original code and execute make.
+
 Hints
 =====
 
