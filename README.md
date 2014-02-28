@@ -13,3 +13,9 @@ Hints
 =====
 
 rp.mat parameters translated to rp.npy
+
+
+Demo
+====
+
+To check it working execute python demo.py inside the pyrp folder.
