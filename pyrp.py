@@ -157,3 +157,10 @@ class RP:
 
         # Return array of boxes.
         return boxes
+
+    def removeDuplicates(self, boxes):
+        assert(self.params['q'] > 0)
+        qBoxes = np.round(boxes / self.params['q'])
+        aux = np.ascontiguousarray(qBoxes).view(np.dtype((np.void, qBoxes.dtype.itemsize * qBoxes.shape[1])))
+        _, idx = np.unique(aux, return_index=True)
+        return qBoxes[idx]

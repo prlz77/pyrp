@@ -18,6 +18,9 @@ def demo(path='./test_images/000013.jpg'):
     # Get the boxes
     boxes = rp.getProposals(img)
 
+    # Remove duplicates
+    boxes = rp.removeDuplicates(boxes)
+
     return boxes
 
 if __name__ == '__main__':
@@ -50,6 +53,7 @@ if __name__ == '__main__':
         else:
             print boxes
 
-    except Exception:
+    except e:
+        print e.message
         print "Usage:"
         print "python demo.py [image=image_path] [savefile=(save_file.npy | save_file.mat)]"
