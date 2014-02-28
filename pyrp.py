@@ -75,6 +75,9 @@ class RP:
     def __init__(self):
         self.params = None
 
+        # Create a dictionary to convert colorspaces.
+        self.colorDic = {"RGB": 1, "rg": 2, "LAB": 3, "Opponent": 4, "HSV": 5}
+
         # Loading of the C++ library with ctypes
         self.rp = ct.cdll.LoadLibrary(os.path.join(os.getcwd(), "rp.so"))
         self.rp.pyRP.restype = Proposals
@@ -86,10 +89,13 @@ class RP:
 
     def loadParamsFromNumpy(self, npyFile):
         self.params = np.load(npyFile).item()
+        self.params['colorspace'] = self.colorDic[self.params['colorspace']]
 
     def getProposals(self, img, params=None):
         if params is not None:
             self.params = params
+            self.params['colorspace'] = self.colorDic[
+                                        self.params['colorspace']]
 
         if img.shape[2] != 3:
             raise Exception("Three dimensions expected")
@@ -108,20 +114,6 @@ class RP:
         if(self.params['rSeedForRun'] == -1):
             self.params['SeedForRun'] = np.int(np.sum(img) %
                                                np.iinfo(np.int32).max)
-
-        # Convert colorspaces to integers to make it easier in the C++:
-        if self.params['colorspace'] == "RGB":
-            self.params['colorspace'] = 1
-        elif self.params['colorspace'] == "rg":
-            self.params['colorspace'] = 2
-        elif self.params['colorspace'] == "LAB":
-            self.params['colorspace'] = 3
-        elif self.params['colorspace'] == "Opponent":
-            self.params['colorspace'] = 4
-        elif self.params['colorspace'] == "HSV":
-            self.params['colorspace'] = 5
-        else:
-            raise Exception("Unknown colorspace")
 
         # Fill Ctypes parameter structures.
         sp = SpParams(self.params['superpixels']['sigma'],
@@ -158,8 +150,8 @@ class RP:
         # Access the pointer to the array of boxes to get results:
         nProposals = proposals[0].nProposals
         boxes = np.ctypeslib.as_array(proposals[0].proposals,
-                                      shape=(nProposals, 4))
-
+                                      shape=(4 * nProposals,))
+        boxes = np.reshape(boxes, [nProposals, 4], 'F')
         # Free C++ allocated memory
         self.rp.deallocate(proposals[0].proposals)
 
