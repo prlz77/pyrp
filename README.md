@@ -19,3 +19,6 @@ Demo
 ====
 
 To check it working execute python demo.py inside the pyrp folder.
+
+Usage:
+	python demo.py [image=image_path] [savefile=(save_file.npy | save_file.mat)]
