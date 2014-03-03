@@ -165,5 +165,20 @@ class RP:
 
     def removeDuplicates(self, boxes):
         assert(self.params['q'] > 0)
-        #qBoxes = np.round(boxes / self.params['q'])
-        return np.array([np.array(x) for x in set(tuple(x) for x in boxes)])
+        qBoxes = np.round(boxes / self.params['q'])
+        unique_boxes = None
+        npyVersion = np.__version__.split(".")
+
+        if npyVersion[0] >= 1 and npyVersion[1] >= 7:
+            b = np.ascontiguousarray(qBoxes).view(np.dtype((np.void, qBoxes.dtype.itemsize * qBoxes.shape[1])))
+            _, idx = np.unique(b, return_index=True)
+            unique_boxes = boxes[idx]
+        else:
+            print "Warning: Using slow version of unique."
+            print "Install numpy 1.7+ to improve performance."
+            boxdict = {}
+            for i in qBoxes:
+                boxdict[str(i)] = i
+            unique_boxes = np.asarray(boxdict.values())
+
+        return unique_boxes
