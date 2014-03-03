@@ -106,7 +106,7 @@ class RP:
         pyImage.columns = img.shape[1]
         pyImage.channels = img.shape[2]
 
-        img = np.require(img, dtype=np.uint8, requirements=['A', 'O', 'C'])
+        img = np.require(img, dtype=np.uint8, requirements=['A', 'O', 'F'])
         image2 = img.ctypes.data_as(ct.POINTER(ct.c_uint8))
         pyImage.data = image2
 
@@ -139,7 +139,7 @@ class RP:
 
         # Compute proposals:
         self.params['nProposals'] = np.int(self.params['approxFinalNBoxes'] / 0.8)
-
+        self.params['nProposals']
         Proposals_p = ct.POINTER(Proposals)
 
         # Actual call to the C++ library
@@ -165,7 +165,7 @@ class RP:
 
     def removeDuplicates(self, boxes):
         assert(self.params['q'] > 0)
-        qBoxes = np.round(boxes / self.params['q'])
+        qBoxes = np.around(boxes / self.params['q'])
         unique_boxes = None
         npyVersion = np.__version__.split(".")
 
@@ -176,9 +176,11 @@ class RP:
         else:
             print "Warning: Using slow version of unique."
             print "Install numpy 1.7+ to improve performance."
-            boxdict = {}
-            for i in qBoxes:
-                boxdict[str(i)] = i
-            unique_boxes = np.asarray(boxdict.values())
+            seen_boxes = []
+            unique_boxes = []
+            for index, box in enumerate(qBoxes):
+                if tuple(box) not in seen_boxes:
+                    seen_boxes.append(tuple(box))
+                    unique_boxes.append(boxes[index])
 
-        return unique_boxes
+        return np.asarray(unique_boxes)

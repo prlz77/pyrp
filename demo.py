@@ -53,7 +53,7 @@ if __name__ == '__main__':
         else:
             print boxes
 
-    except e:
+    except Exception as e:
         print e.message
         print "Usage:"
         print "python demo.py [image=image_path] [savefile=(save_file.npy | save_file.mat)]"
