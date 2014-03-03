@@ -112,8 +112,13 @@ class RP:
 
         # Set random seed:
         if(self.params['rSeedForRun'] == -1):
-            self.params['SeedForRun'] = np.int(np.sum(img) %
+            self.params['rSeedForRun'] = np.int(np.sum(img) %
                                                np.iinfo(np.int32).max)
+
+        # TODO: Multiple segmentations
+        k = 1
+        if 'rSeedForRun' in self.params:
+            self.params['rSeedForRun'] += k
 
         # Fill Ctypes parameter structures.
         sp = SpParams(self.params['superpixels']['sigma'],
@@ -144,7 +149,7 @@ class RP:
                                 self.params['nProposals'],
                                 self.params['colorspace'],
                                 ct.byref(alpha),
-                                self.params['SeedForRun'],
+                                self.params['rSeedForRun'],
                                 True))
 
         # Access the pointer to the array of boxes to get results:
@@ -160,7 +165,5 @@ class RP:
 
     def removeDuplicates(self, boxes):
         assert(self.params['q'] > 0)
-        qBoxes = np.round(boxes / self.params['q'])
-        aux = np.ascontiguousarray(qBoxes).view(np.dtype((np.void, qBoxes.dtype.itemsize * qBoxes.shape[1])))
-        _, idx = np.unique(aux, return_index=True)
-        return qBoxes[idx]
+        #qBoxes = np.round(boxes / self.params['q'])
+        return np.array([np.array(x) for x in set(tuple(x) for x in boxes)])
