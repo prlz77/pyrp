@@ -154,8 +154,8 @@ class RP:
 
         # Access the pointer to the array of boxes to get results:
         nProposals = proposals[0].nProposals
-        boxes = np.ctypeslib.as_array(proposals[0].proposals,
-                                      shape=(4 * nProposals,))
+        boxes = np.copy(np.ctypeslib.as_array(proposals[0].proposals,
+                                      shape=(4 * nProposals,)))
         boxes = np.reshape(boxes, [nProposals, 4], 'F')
         # Free C++ allocated memory
         self.rp.deallocate(proposals[0].proposals)
